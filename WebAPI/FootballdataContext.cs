@@ -16,13 +16,13 @@ namespace WebAPI
         {
         }
 
-        public virtual DbSet<Match> Matches { get; set; }
-        public virtual DbSet<MatchOdd> MatchOdds { get; set; }
-        public virtual DbSet<SportDescr> SportDescrs { get; set; }
+        public virtual DbSet<DbMatch> Matches { get; set; }
+        public virtual DbSet<DbMatchOdd> MatchOdds { get; set; }
+        public virtual DbSet<DbSportDescr> SportDescrs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Match>(entity =>
+            modelBuilder.Entity<DbMatch>(entity =>
             {
                 entity.ToTable("Match");
 
@@ -54,7 +54,7 @@ namespace WebAPI
                     .HasConstraintName("FK_Match_SportDescr");
             });
 
-            modelBuilder.Entity<MatchOdd>(entity =>
+            modelBuilder.Entity<DbMatchOdd>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -71,7 +71,7 @@ namespace WebAPI
                     .HasConstraintName("FK_MatchOdds_Match");
             });
 
-            modelBuilder.Entity<SportDescr>(entity =>
+            modelBuilder.Entity<DbSportDescr>(entity =>
             {
                 entity.ToTable("SportDescr");
 

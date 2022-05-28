@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebAPI.ApiModels;
 
 namespace WebAPI.Controllers
 {
@@ -20,14 +22,14 @@ namespace WebAPI.Controllers
 
         // GET: api/Matches (all the matches)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Match>>> GetMatches()
+        public async Task<ActionResult<IEnumerable<DbMatch>>> GetMatches()
         {
             return await _context.Matches.ToListAsync();            
         }
 
         // Get: api/Matches/{id} (single match by id)
         [HttpGet("{id}")]
-        public async Task<ActionResult<Match>> GetMatchById(int id)
+        public async Task<ActionResult<DbMatch>> GetMatchById(int id)
         {            
             var match = await _context.Matches.FindAsync(id); 
 
@@ -41,15 +43,50 @@ namespace WebAPI.Controllers
 
         // PUT: api/Match/{id}        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMatchById(int id, Match match)
-        {           
+        public async Task<IActionResult> PutMatchById(int id, ApiMatch match)
+        {
+            // Validate Input
 
+
+            //           
             if (id != match.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(match).State = EntityState.Modified;
+            // get dbmatch object from the given id
+            var dbMatchUpdate = _context.Matches.AsNoTracking()
+                .Single(q => q.Id == id);
+
+            // create the right format for timestamp
+            var matchtime = new TimeSpan(match.Hour, match.Minutes, 00);
+            
+
+            dbMatchUpdate.Description = match.Description;
+
+            // accepteble format "YYYYY-MM-dd"
+            dbMatchUpdate.MatchDate = match.MatchDate;
+            dbMatchUpdate.MatchTime = matchtime;
+            dbMatchUpdate.TeamA = match.TeamA;
+            dbMatchUpdate.TeamB = match.TeamB;
+            dbMatchUpdate.Sport = match.Sport;
+
+            //.Select(q => new DbMatch
+            //{
+            //    dbMatchUpdate.Id = q.Id,
+            //    dbMatchUpdate.Description = match.Description,
+            //    dbMatchUpdate.MatchDate = match.MatchDate,
+            //    dbMatchUpdate.MatchTime = TimeSpan.FromHours(12),
+            //    dbMatchUpdate.TeamA = match.TeamA,
+            //    dbMatchUpdate.TeamB = match.TeamB,
+            //    dbMatchUpdate.Sport = match.Sport
+            //});
+
+
+
+            //_context.Entry(match).State = EntityState.Modified;
+
+            _context.Entry(dbMatchUpdate).State = EntityState.Modified;
 
             try
             {
@@ -77,7 +114,7 @@ namespace WebAPI.Controllers
 
         // POST: api/Match        
         [HttpPost]
-        public async Task<ActionResult<Match>> PostMatch(Match match)
+        public async Task<ActionResult<DbMatch>> PostMatch(DbMatch match)
         {
             _context.Matches.Add(match);
             await _context.SaveChangesAsync();

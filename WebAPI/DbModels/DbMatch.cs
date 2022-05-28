@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI
 {
-    public partial class Match
+    public partial class DbMatch
     {
-        public Match()
+        public DbMatch()
         {
-            MatchOdds = new HashSet<MatchOdd>();
+            MatchOdds = new HashSet<DbMatchOdd>();
         }
 
         public int Id { get; set; }
@@ -19,7 +19,7 @@ namespace WebAPI
         public string TeamB { get; set; }
         public int Sport { get; set; }
 
-        public virtual SportDescr SportNavigation { get; set; }
-        public virtual ICollection<MatchOdd> MatchOdds { get; set; }
+        public virtual DbSportDescr SportNavigation { get; set; }
+        public virtual ICollection<DbMatchOdd> MatchOdds { get; set; }
     }
 }

@@ -20,14 +20,14 @@ namespace WebAPI.Controllers
 
         // GET: api/MatchOdds (all the MatchOdds)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MatchOdd>>> GetMatchOdds()
+        public async Task<ActionResult<IEnumerable<DbMatchOdd>>> GetMatchOdds()
         {
             return await _context.MatchOdds.ToListAsync();
         }
 
         // Get: api/MatchOdd/{id} (single MatchOdd by id)
         [HttpGet("{id}")]
-        public async Task<ActionResult<MatchOdd>> GetMatchOddById(int id)
+        public async Task<ActionResult<DbMatchOdd>> GetMatchOddById(int id)
         {
             var matchOdds = await _context.MatchOdds.FindAsync(id);
 
@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/MatchOdd/{id}        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMatchOddById(int id, MatchOdd matchOdd)
+        public async Task<IActionResult> PutMatchOddById(int id, DbMatchOdd matchOdd)
         {
 
             if (id != matchOdd.Id)
@@ -77,7 +77,7 @@ namespace WebAPI.Controllers
 
         // POST: api/MatchOdd        
         [HttpPost]
-        public async Task<ActionResult<Match>> PostMatchOdd(MatchOdd matchOdd)
+        public async Task<ActionResult<DbMatch>> PostMatchOdd(DbMatchOdd matchOdd)
         {
             _context.MatchOdds.Add(matchOdd);
             await _context.SaveChangesAsync();
