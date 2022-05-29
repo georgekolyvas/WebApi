@@ -82,8 +82,6 @@ namespace WebAPI.Controllers
             //    dbMatchUpdate.Sport = match.Sport
             //});
 
-
-
             //_context.Entry(match).State = EntityState.Modified;
 
             _context.Entry(dbMatchUpdate).State = EntityState.Modified;
