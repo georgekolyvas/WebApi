@@ -48,10 +48,10 @@ namespace WebAPI.Controllers
         {                      
             if (id != match.Id)
             {
-                return BadRequest();
+                return BadRequest("Parameter's Id and Object's Id must be the same!");
             }
 
-            // get dbmatch object from the given id   
+            // get dbMatch object from the given id   
             var dbMatchUpdate = await _context.Matches.AsNoTracking()
                 .FirstOrDefaultAsync(q => q.Id == id);
 
@@ -81,7 +81,7 @@ namespace WebAPI.Controllers
                 }
                 else
                 {
-                    return UnprocessableEntity("This Id already exists!");
+                    throw;
                 }
             }
 

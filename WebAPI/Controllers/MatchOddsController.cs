@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebAPI.ApiModels;
 
 namespace WebAPI.Controllers
 {
@@ -39,17 +40,28 @@ namespace WebAPI.Controllers
             return matchOdds;
         }
 
-        // PUT: api/MatchOdd/{id}        
+        // PUT: api/MatchOdd/{id}
+        // Update an existing entity
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMatchOddById(int id, DbMatchOdd matchOdd)
+        public async Task<IActionResult> PutMatchOddById(int id, ApiMatchOdd matchOdd)
         {
 
             if (id != matchOdd.Id)
             {
-                return BadRequest();
+                return BadRequest("Parameter's Id and Object's Id must be the same!");
             }
 
-            _context.Entry(matchOdd).State = EntityState.Modified;
+            // get dbMatchOdd object from the given id   
+            var dbMatchOddUpdate = await _context.MatchOdds.AsNoTracking()
+                .FirstOrDefaultAsync(q => q.Id == id);
+          
+            dbMatchOddUpdate.Id = id;           
+            dbMatchOddUpdate.MatchId = matchOdd.Id;
+            dbMatchOddUpdate.Specifier = matchOdd.Specifier;
+            dbMatchOddUpdate.Odd = matchOdd.Odd;
+
+            // set the entity
+            _context.Entry(dbMatchOddUpdate).State = EntityState.Modified;
 
             try
             {
@@ -70,12 +82,8 @@ namespace WebAPI.Controllers
             return NoContent();
         }
 
-        private bool MatchOddExists(int id)
-        {
-            return _context.MatchOdds.Any(e => e.Id == id);
-        }
-
-        // POST: api/MatchOdd        
+        // POST: api/MatchOdd
+        // Insert a new entity
         [HttpPost]
         public async Task<ActionResult<DbMatch>> PostMatchOdd(DbMatchOdd matchOdd)
         {
@@ -83,6 +91,11 @@ namespace WebAPI.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("PostMatchOdd", new { id = matchOdd.Id }, matchOdd);
+        }
+
+        private bool MatchOddExists(int id)
+        {
+            return _context.MatchOdds.Any(e => e.Id == id);
         }
 
         // DELETE: api/MatchOdd/{id}
