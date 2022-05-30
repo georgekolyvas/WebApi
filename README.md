@@ -4,6 +4,8 @@
 
 ### Usefull Informations
 
+![DbImage](/Images/WebApiDb.png "DbImage")
+
 *{table}.{field}*
 
 * Database table "Match" has Match.Id as primary key and Match.Sport as foreign key pointing at SportDescr.Id
