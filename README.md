@@ -4,7 +4,7 @@
 
 ### Usefull Informations
 
-![DbImage](/Images/WebApiDb.png "DbImage")
+![DbImage](https://github.com/georgekolyvas/WebApi/blob/master/WebAPI/Images/WebApiDb.png "DbImage") 
 
 *{table}.{field}*
 
