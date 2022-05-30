@@ -20,11 +20,11 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Matches (all the matches)
+        // GET: api/Matches (all the matches)        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DbMatch>>> GetMatches()
         {
-            return await _context.Matches.ToListAsync();            
+            return await _context.Matches.ToListAsync();
         }
 
         // Get: api/Matches/{id} (single match by id)
@@ -41,51 +41,32 @@ namespace WebAPI.Controllers
             return match;
         }
 
-        // PUT: api/Match/{id}        
+        // PUT: api/Match/{id}
+        // Update an existing entity
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMatchById(int id, ApiMatch match)
-        {
-            // Validate Input
-
-
-            //           
+        {                      
             if (id != match.Id)
             {
-                return BadRequest();
+                return BadRequest("Parameter's Id and Object's Id must be the same!");
             }
 
-            // get dbmatch object from the given id
-            var dbMatchUpdate = _context.Matches.AsNoTracking()
-                .Single(q => q.Id == id);
+            // get dbMatch object from the given id   
+            var dbMatchUpdate = await _context.Matches.AsNoTracking()
+                .FirstOrDefaultAsync(q => q.Id == id);
 
-            // create the right format for timestamp
+            // create the right format for time
             var matchtime = new TimeSpan(match.Hour, match.Minutes, 00);
-            
 
-            dbMatchUpdate.Description = match.Description;
-
-            // accepteble format "YYYYY-MM-dd"
-            dbMatchUpdate.MatchDate = match.MatchDate;
+            dbMatchUpdate.Id = id;
+            dbMatchUpdate.Description = match.Description;           
+            dbMatchUpdate.MatchDate = match.MatchDate;  // acceptable format "yyyy/MM/dd/"
             dbMatchUpdate.MatchTime = matchtime;
             dbMatchUpdate.TeamA = match.TeamA;
             dbMatchUpdate.TeamB = match.TeamB;
-            dbMatchUpdate.Sport = match.Sport;
-
-            //.Select(q => new DbMatch
-            //{
-            //    dbMatchUpdate.Id = q.Id,
-            //    dbMatchUpdate.Description = match.Description,
-            //    dbMatchUpdate.MatchDate = match.MatchDate,
-            //    dbMatchUpdate.MatchTime = TimeSpan.FromHours(12),
-            //    dbMatchUpdate.TeamA = match.TeamA,
-            //    dbMatchUpdate.TeamB = match.TeamB,
-            //    dbMatchUpdate.Sport = match.Sport
-            //});
-
-
-
-            //_context.Entry(match).State = EntityState.Modified;
-
+            dbMatchUpdate.Sport = match.Sport; 
+            
+            // set the new entity 
             _context.Entry(dbMatchUpdate).State = EntityState.Modified;
 
             try
@@ -105,21 +86,41 @@ namespace WebAPI.Controllers
             }
 
             return NoContent();
+        }       
+
+        // POST: api/Match
+        // Insert a new entity
+        [HttpPost]
+        public async Task<ActionResult<DbMatch>> PostMatch(ApiMatch match)
+        {
+            if (!MatchExists(match.Id))
+            {
+                var dbMatchInsert = new DbMatch();
+                // create the right format for time
+                var matchtime = new TimeSpan(match.Hour, match.Minutes, 00);
+
+                dbMatchInsert.Id = match.Id;
+                dbMatchInsert.Description = match.Description;
+                dbMatchInsert.MatchDate = match.MatchDate;  // acceptable format "yyyy/MM/dd/"
+                dbMatchInsert.MatchTime = matchtime;
+                dbMatchInsert.TeamA = match.TeamA;
+                dbMatchInsert.TeamB = match.TeamB;
+                dbMatchInsert.Sport = match.Sport;
+
+                _context.Matches.Add(dbMatchInsert);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("PostMatch", new { id = match.Id }, match);            
+            }
+            else
+            {
+                return UnprocessableEntity("This Id already exists!");
+            }
         }
 
         private bool MatchExists(int id)
         {
             return _context.Matches.Any(e => e.Id == id);
-        }
-
-        // POST: api/Match        
-        [HttpPost]
-        public async Task<ActionResult<DbMatch>> PostMatch(DbMatch match)
-        {
-            _context.Matches.Add(match);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("PostMatch", new { id = match.Id }, match);
         }
 
         // DELETE: api/Match/{id}
