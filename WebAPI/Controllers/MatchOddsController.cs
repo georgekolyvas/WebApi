@@ -21,14 +21,14 @@ namespace WebAPI.Controllers
 
         // GET: api/MatchOdds (all the MatchOdds)
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DbMatchOdd>>> GetMatchOdds()
+        public async Task<ActionResult<IEnumerable<MatchOdd>>> GetMatchOdds()
         {
             return await _context.MatchOdds.ToListAsync();
         }
 
         // Get: api/MatchOdd/{id} (single MatchOdd by id)
         [HttpGet("{id}")]
-        public async Task<ActionResult<DbMatchOdd>> GetMatchOddById(int id)
+        public async Task<ActionResult<MatchOdd>> GetMatchOddById(int id)
         {
             var matchOdds = await _context.MatchOdds.FindAsync(id);
 
@@ -51,12 +51,13 @@ namespace WebAPI.Controllers
                 return BadRequest("Parameter's Id and Object's Id must be the same!");
             }
 
-            // get dbMatchOdd object from the given id   
+            // get db MatchOdd object from the given id   
             var dbMatchOddUpdate = await _context.MatchOdds.AsNoTracking()
                 .FirstOrDefaultAsync(q => q.Id == id);
-          
+
+            // pass the api object's values to db object 
             dbMatchOddUpdate.Id = id;           
-            dbMatchOddUpdate.MatchId = matchOdd.Id;
+            dbMatchOddUpdate.MatchId = matchOdd.MatchId;
             dbMatchOddUpdate.Specifier = matchOdd.Specifier;
             dbMatchOddUpdate.Odd = matchOdd.Odd;
 
@@ -85,12 +86,25 @@ namespace WebAPI.Controllers
         // POST: api/MatchOdd
         // Insert a new entity
         [HttpPost]
-        public async Task<ActionResult<DbMatch>> PostMatchOdd(DbMatchOdd matchOdd)
+        public async Task<ActionResult<MatchOdd>> PostMatchOdd(ApiMatchOdd matchOdd)
         {
-            _context.MatchOdds.Add(matchOdd);
-            await _context.SaveChangesAsync();
+            if (!MatchOddExists(matchOdd.Id))
+            {
+                var dbMatchOddInsert = new MatchOdd();
+                dbMatchOddInsert.Id = matchOdd.Id;
+                dbMatchOddInsert.MatchId = matchOdd.MatchId;
+                dbMatchOddInsert.Specifier = matchOdd.Specifier;
+                dbMatchOddInsert.Odd = matchOdd.Odd;
 
-            return CreatedAtAction("PostMatchOdd", new { id = matchOdd.Id }, matchOdd);
+                _context.MatchOdds.Add(dbMatchOddInsert);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("PostMatchOdd", new { id = matchOdd.Id }, matchOdd);
+            }
+            else
+            {
+                return UnprocessableEntity("This Id already exists!");
+            }
         }
 
         private bool MatchOddExists(int id)

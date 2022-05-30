@@ -16,13 +16,13 @@ namespace WebAPI
         {
         }
 
-        public virtual DbSet<DbMatch> Matches { get; set; }
-        public virtual DbSet<DbMatchOdd> MatchOdds { get; set; }
-        public virtual DbSet<DbSportDescr> SportDescrs { get; set; }
+        public virtual DbSet<Match> Matches { get; set; }
+        public virtual DbSet<MatchOdd> MatchOdds { get; set; }
+        public virtual DbSet<SportDescr> SportDescrs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DbMatch>(entity =>
+            modelBuilder.Entity<Match>(entity =>
             {
                 entity.ToTable("Match");
 
@@ -50,11 +50,10 @@ namespace WebAPI
                 entity.HasOne(d => d.SportNavigation)
                     .WithMany(p => p.Matches)
                     .HasForeignKey(d => d.Sport)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Match_SportDescr");
             });
 
-            modelBuilder.Entity<DbMatchOdd>(entity =>
+            modelBuilder.Entity<MatchOdd>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -71,7 +70,7 @@ namespace WebAPI
                     .HasConstraintName("FK_MatchOdds_Match");
             });
 
-            modelBuilder.Entity<DbSportDescr>(entity =>
+            modelBuilder.Entity<SportDescr>(entity =>
             {
                 entity.ToTable("SportDescr");
 

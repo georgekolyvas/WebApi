@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace WebAPI
 {
-    public partial class DbSportDescr
+    public partial class SportDescr
     {
-        public DbSportDescr()
+        public SportDescr()
         {
-            Matches = new HashSet<DbMatch>();
+            Matches = new HashSet<Match>();
         }
 
         public int Id { get; set; }
         public string Description { get; set; }
 
-        public virtual ICollection<DbMatch> Matches { get; set; }
+        public virtual ICollection<Match> Matches { get; set; }
     }
 }

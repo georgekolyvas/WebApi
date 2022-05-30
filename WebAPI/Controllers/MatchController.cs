@@ -22,14 +22,21 @@ namespace WebAPI.Controllers
 
         // GET: api/Matches (all the matches)        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DbMatch>>> GetMatches()
+        public async Task<ActionResult<IEnumerable<Match>>> GetMatches()
         {
-            return await _context.Matches.ToListAsync();
+            var matches = await _context.Matches.ToListAsync();
+            // changing Date / Time formats from sql server
+            //foreach (var match in matches)
+            //{
+            //    match.MatchDate = DateTime.Parse(match.MatchDate.ToString("yyyy-MM-dd"));
+            //    match.MatchTime = new TimeSpan(match.MatchTime.Hours, match.MatchTime.Minutes, 00);
+            //}
+            return matches;
         }
 
         // Get: api/Matches/{id} (single match by id)
         [HttpGet("{id}")]
-        public async Task<ActionResult<DbMatch>> GetMatchById(int id)
+        public async Task<ActionResult<Match>> GetMatchById(int id)
         {            
             var match = await _context.Matches.FindAsync(id); 
 
@@ -37,7 +44,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound();
             }
-
+            
             return match;
         }
 
@@ -51,13 +58,14 @@ namespace WebAPI.Controllers
                 return BadRequest("Parameter's Id and Object's Id must be the same!");
             }
 
-            // get dbMatch object from the given id   
+            // get db Match object from the given id   
             var dbMatchUpdate = await _context.Matches.AsNoTracking()
                 .FirstOrDefaultAsync(q => q.Id == id);
 
             // create the right format for time
             var matchtime = new TimeSpan(match.Hour, match.Minutes, 00);
 
+            // pass the api object's values to db object
             dbMatchUpdate.Id = id;
             dbMatchUpdate.Description = match.Description;           
             dbMatchUpdate.MatchDate = match.MatchDate;  // acceptable format "yyyy/MM/dd/"
@@ -91,11 +99,11 @@ namespace WebAPI.Controllers
         // POST: api/Match
         // Insert a new entity
         [HttpPost]
-        public async Task<ActionResult<DbMatch>> PostMatch(ApiMatch match)
+        public async Task<ActionResult<Match>> PostMatch(ApiMatch match)
         {
             if (!MatchExists(match.Id))
             {
-                var dbMatchInsert = new DbMatch();
+                var dbMatchInsert = new Match();
                 // create the right format for time
                 var matchtime = new TimeSpan(match.Hour, match.Minutes, 00);
 
